@@ -1,7 +1,8 @@
 
 import React, { useEffect, useState } from "react";
 
-const SERVER_URL = `http://${window.location.hostname}:5000`;
+const SERVER_URL = "https://imtiaz-trader-api.vercel.app";
+
 const API = `${SERVER_URL}/api/products`;
 const CATEGORY_API = `${SERVER_URL}/api/categories`;
 

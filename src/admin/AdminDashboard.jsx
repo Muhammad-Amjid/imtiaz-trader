@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API = `http://${window.location.hostname}:5000`;
+const API = "https://imtiaz-trader-api.vercel.app";
 
 function AdminDashboard() {
   const navigate = useNavigate();

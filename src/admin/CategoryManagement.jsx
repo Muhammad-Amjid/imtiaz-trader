@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 
-const API = `http://${window.location.hostname}:5000/api/categories`;
+const API = "https://imtiaz-trader-api.vercel.app/api/categories";
 
 function CategoryManagement() {
   const token = localStorage.getItem("adminToken");

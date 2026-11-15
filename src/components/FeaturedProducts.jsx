@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import ScrollReveal from "./ScrollReveal";
 
 // Automatically uses the current device's hostname
-const SERVER_URL = `http://${window.location.hostname}:5000`;
+const SERVER_URL = "https://imtiaz-trader-api.vercel.app";
 const API_URL = `${SERVER_URL}/api/products`;
 
 const fallbackImage =

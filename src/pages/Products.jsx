@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
-const SERVER_URL = `http://${window.location.hostname}:5000`;
+const SERVER_URL = "https://imtiaz-trader-api.vercel.app";
+
 const API_URL = `${SERVER_URL}/api/products`;
 const CATEGORY_API = `${SERVER_URL}/api/categories`;
 const PLACEHOLDER = "/products/laptop-placeholder.jpeg";
