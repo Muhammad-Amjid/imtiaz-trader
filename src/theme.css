@@ -1,0 +1,56 @@
+
+:root {
+  --bs-danger: #a5222d;
+  --bs-danger-rgb: 165, 34, 45;
+
+  --bs-dark: #191b20;
+  --bs-dark-rgb: 25, 27, 32;
+
+  --bs-light: #f4f5f6;
+  --bs-light-rgb: 244, 245, 246;
+
+  --bs-primary: #a5222d;
+  --bs-primary-rgb: 165, 34, 45;
+}
+
+/* Brand colors */
+.bg-danger {
+  background-color: #a5222d !important;
+}
+
+.text-danger {
+  color: #a5222d !important;
+}
+
+/* Danger buttons */
+.btn-danger {
+  --bs-btn-color: #ffffff;
+  --bs-btn-bg: #a5222d;
+  --bs-btn-border-color: #a5222d;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: #861b24;
+  --bs-btn-hover-border-color: #861b24;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: #741720;
+  --bs-btn-active-border-color: #741720;
+  --bs-btn-disabled-bg: #a5222d;
+  --bs-btn-disabled-border-color: #a5222d;
+}
+
+/* Outline danger buttons */
+.btn-outline-danger {
+  --bs-btn-color: #a5222d;
+  --bs-btn-border-color: #a5222d;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: #a5222d;
+  --bs-btn-hover-border-color: #a5222d;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: #861b24;
+  --bs-btn-active-border-color: #861b24;
+}
+
+/* Consistent keyboard focus */
+.btn-danger:focus-visible,
+.btn-outline-danger:focus-visible {
+  box-shadow: 0 0 0 0.25rem rgba(165, 34, 45, 0.25);
+}

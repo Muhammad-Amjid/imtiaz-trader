@@ -1,0 +1,324 @@
+
+/* ==============================
+   PROMO SLIDER
+============================== */
+
+.promo-slider {
+  width: 100%;
+  min-height: 440px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.promo-overlay {
+  min-height: 440px;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(
+    90deg,
+    rgba(10, 12, 20, 0.9),
+    rgba(10, 12, 20, 0.58)
+  );
+}
+
+.promo-content {
+  width: 100%;
+  max-width: 750px;
+  margin: 0;
+  padding: 75px 15px 35px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.promo-small {
+  color: #ff7518;
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 15px;
+  opacity: 0;
+  animation: promoFadeUp 0.7s ease forwards;
+  letter-spacing: 1px;
+}
+
+.promo-title {
+  color: #ffffff;
+  font-size: clamp(35px, 5vw, 58px);
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 20px;
+  max-width: 700px;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.promo-title .promo-word {
+  display: inline-block;
+  white-space: nowrap;
+  margin-right: 0.3em;
+}
+
+.promo-title .promo-letter {
+  display: inline-block;
+  opacity: 0;
+  animation: promoLetter 0.35s ease forwards;
+}
+
+.promo-description {
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.7;
+  max-width: 650px;
+  margin: 0;
+  opacity: 0;
+  animation: promoFadeUp 0.8s ease 2.2s forwards;
+}
+
+.promo-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #a5222d;
+  color: #ffffff;
+  padding: 14px 30px;
+  margin-top: 25px;
+  border-radius: 6px;
+  font-weight: 800;
+  text-decoration: none;
+  opacity: 0;
+  animation: promoFadeUp 0.8s ease 2.8s forwards;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.promo-button:hover {
+  background: #ff7518;
+  color: #ffffff;
+  transform: translateY(-3px);
+}
+
+/* ==============================
+   SLIDER CONTROLS
+============================== */
+
+.promo-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 0 15px 20px;
+}
+
+.promo-controls button {
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 8px;
+  transition: color 0.3s ease;
+}
+
+.promo-controls button:hover {
+  color: #ff7518;
+}
+
+.promo-controls .promo-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #999999;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.promo-controls .promo-indicator.active {
+  background: #ff7518;
+  width: 28px;
+  border-radius: 10px;
+}
+
+/* ==============================
+   ANIMATIONS
+============================== */
+
+@keyframes promoLetter {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes promoFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==============================
+   TABLETS
+============================== */
+
+@media (max-width: 991px) {
+  .promo-slider,
+  .promo-overlay {
+    min-height: 400px;
+  }
+
+  .promo-content {
+    max-width: 650px;
+    padding: 65px 20px 30px;
+  }
+
+  .promo-title {
+    font-size: clamp(34px, 5.5vw, 48px);
+  }
+
+  .promo-description {
+    font-size: 17px;
+    max-width: 570px;
+  }
+}
+
+/* ==============================
+   MOBILE
+============================== */
+
+@media (max-width: 768px) {
+  .promo-slider,
+  .promo-overlay {
+    min-height: 380px;
+  }
+
+  .promo-overlay {
+    background: linear-gradient(
+      90deg,
+      rgba(10, 12, 20, 0.9),
+      rgba(10, 12, 20, 0.68)
+    );
+  }
+
+  .promo-content {
+    max-width: 100%;
+    padding: 55px 20px 30px;
+  }
+
+  .promo-small {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .promo-title {
+    font-size: clamp(30px, 6vw, 40px);
+    line-height: 1.2;
+    margin-bottom: 15px;
+  }
+
+  .promo-description {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .promo-button {
+    padding: 12px 24px;
+    font-size: 14px;
+    margin-top: 20px;
+  }
+
+  .promo-controls {
+    gap: 12px;
+    padding-bottom: 18px;
+  }
+}
+
+/* ==============================
+   SMALL MOBILE
+============================== */
+
+@media (max-width: 480px) {
+  .promo-slider,
+  .promo-overlay {
+    min-height: 350px;
+  }
+
+  .promo-content {
+    padding: 45px 18px 25px;
+  }
+
+  .promo-small {
+    font-size: 12px;
+    letter-spacing: 0.7px;
+  }
+
+  .promo-title {
+    font-size: clamp(27px, 8vw, 34px);
+    line-height: 1.2;
+    margin-bottom: 13px;
+  }
+
+  .promo-description {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .promo-button {
+    padding: 11px 20px;
+    font-size: 13px;
+  }
+
+  .promo-controls {
+    gap: 10px;
+    padding-bottom: 15px;
+  }
+
+  .promo-controls button {
+    font-size: 18px;
+    padding: 6px;
+  }
+
+  .promo-controls .promo-indicator {
+    width: 8px;
+    height: 8px;
+  }
+
+  .promo-controls .promo-indicator.active {
+    width: 23px;
+  }
+}
+
+/* ==============================
+   EXTRA SMALL MOBILE
+============================== */
+
+@media (max-width: 360px) {
+  .promo-slider,
+  .promo-overlay {
+    min-height: 330px;
+  }
+
+  .promo-content {
+    padding: 40px 15px 20px;
+  }
+
+  .promo-title {
+    font-size: 26px;
+  }
+
+  .promo-description {
+    font-size: 13px;
+  }
+}

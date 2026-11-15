@@ -1,0 +1,490 @@
+
+:root {
+  --text: #555b63;
+  --text-h: #191b20;
+  --bg: #ffffff;
+  --border: #e5e7eb;
+  --accent: #a5222d;
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: 0.18px;
+  color-scheme: light;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #ffffff;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--heading);
+  color: var(--text-h);
+}
+
+p {
+  margin-top: 0;
+}
+
+/* Product Cards */
+
+.product-card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.13);
+}
+
+.product-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  padding: 15px;
+  background: #f7f7f7;
+  transition: transform 0.4s ease;
+}
+
+.product-card:hover img {
+  transform: scale(1.06);
+}
+
+.product-card .card-body {
+  padding: 20px;
+}
+
+.product-card h5 {
+  color: #191b20;
+}
+
+.product-card .product-condition {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Brand Cards */
+
+.brand-card {
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.brand-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.14) !important;
+}
+
+.brand-card img {
+  transition: transform 0.4s ease;
+}
+
+.brand-card:hover img {
+  transform: scale(1.07);
+}
+
+.brand-card h5 {
+  transition: color 0.3s ease;
+}
+
+.brand-card:hover h5 {
+  color: #a5222d;
+}
+
+/* Homepage Hero Section */
+
+.hero-section {
+  background: linear-gradient(120deg, #151515, #292025, #50151d);
+  color: white;
+  padding: 100px 0;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.hero-content {
+  max-width: 850px;
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.04);
+  border-left: 5px solid #a5222d;
+  border-radius: 12px;
+}
+
+.hero-welcome {
+  display: inline-block;
+  background: #a5222d;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 25px;
+}
+
+.hero-welcome span {
+  display: inline-block;
+  opacity: 0;
+  animation: letterReveal 0.4s ease forwards;
+}
+
+@keyframes letterReveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-title {
+  font-size: clamp(42px, 6vw, 68px);
+  font-weight: 800;
+  line-height: 1.2;
+  color: white;
+  animation: slideUp 0.9s ease 2.2s both;
+}
+
+.hero-title span {
+  color: #e34a56;
+  background: rgba(165, 34, 45, 0.18);
+  padding: 0 8px;
+  border-radius: 6px;
+}
+
+.hero-description {
+  color: #dddddd;
+  font-size: 19px;
+  line-height: 1.8;
+  max-width: 650px;
+  margin-top: 22px;
+  animation: slideUp 0.9s ease 2.6s both;
+}
+
+.hero-button {
+  padding: 13px 25px;
+  font-weight: 600;
+  margin-top: 15px;
+  animation: slideUp 0.9s ease 3s both;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile Hero */
+
+@media (max-width: 576px) {
+  .hero-section {
+    padding: 65px 0;
+    min-height: auto;
+  }
+
+  .hero-content {
+    padding: 18px;
+  }
+
+  .hero-welcome {
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  .hero-title {
+    font-size: 38px;
+  }
+
+  .hero-description {
+    font-size: 16px;
+  }
+}
+
+/* Website Section Animations */
+
+.animate-section {
+  animation: sectionFade 0.8s ease both;
+}
+
+@keyframes sectionFade {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Section Headings */
+
+.section-heading {
+  animation: headingFade 0.8s ease both;
+}
+
+@keyframes headingFade {
+  from {
+    opacity: 0;
+    transform: translateX(-25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Scroll Reveal Animation */
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(35px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Compact Product Cards on Mobile */
+
+@media (max-width: 576px) {
+  .product-card img {
+    height: 100px !important;
+    padding: 5px;
+    object-fit: contain !important;
+  }
+
+  .product-card .card-body {
+    padding: 8px !important;
+  }
+
+  .product-card h5 {
+    font-size: 12px;
+  }
+
+  .product-card p {
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+
+  .product-card .btn {
+    font-size: 10px;
+    padding: 5px 3px;
+  }
+}
+
+/* Respect reduced-motion preferences */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+
+
+/* Laptop Brands Section */
+.brand-section {
+  background: #f7f7f7;
+}
+
+.brand-card {
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.brand-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12) !important;
+}
+
+.brand-image-wrapper {
+  height: 190px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  padding: 12px;
+}
+
+.brand-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.brand-card:hover .brand-image {
+  transform: scale(1.07);
+}
+
+.brand-card h5 {
+  color: #222;
+  transition: color 0.3s ease;
+}
+
+.brand-card:hover h5 {
+  color: #a5222d;
+}
+
+@media (max-width: 576px) {
+  .brand-image-wrapper {
+    height: 150px;
+  }
+}
+
+
+
+/* =====================================
+   IMTIAZ TRADER - MOBILE DESKTOP-LIKE LAYOUT
+===================================== */
+
+@media (max-width: 576px) {
+
+  /* General section spacing */
+  section {
+    padding-top: 25px;
+    padding-bottom: 25px;
+  }
+
+  /* Bootstrap-style 3-column grid */
+  .row.mobile-three-columns > * {
+    width: 33.333333% !important;
+    flex: 0 0 33.333333% !important;
+    max-width: 33.333333% !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+
+  /* Featured product cards */
+  .product-card {
+    height: 100%;
+    border-radius: 8px;
+  }
+
+  .product-card img {
+    height: 105px !important;
+    padding: 5px !important;
+  }
+
+  .product-card .card-body {
+    padding: 7px !important;
+  }
+
+  .product-card h5 {
+    font-size: 11px !important;
+    line-height: 1.3;
+  }
+
+  .product-card p {
+    font-size: 9px !important;
+  }
+
+  .product-card .btn {
+    font-size: 9px !important;
+    padding: 5px 2px !important;
+  }
+
+  /* Compact headings */
+  .section-heading h2,
+  section h2 {
+    font-size: 23px;
+  }
+
+  .section-heading p,
+  section > .container > p {
+    font-size: 12px;
+  }
+
+  /* Compact cards */
+  .brand-image-wrapper {
+    height: 95px !important;
+  }
+
+  /* Prevent oversized card spacing */
+  .card {
+    margin-bottom: 8px;
+  }
+
+  /* Footer: three columns in one row */
+  footer .row > * {
+    width: 33.333333% !important;
+    flex: 0 0 33.333333% !important;
+    max-width: 33.333333% !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+
+  footer h5,
+  footer h4 {
+    font-size: 12px !important;
+  }
+
+  footer p,
+  footer a,
+  footer li {
+    font-size: 9px !important;
+    overflow-wrap: anywhere;
+  }
+
+  footer iframe {
+    max-width: 100%;
+    height: 85px;
+  }
+}
