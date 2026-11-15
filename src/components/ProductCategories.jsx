@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const API = "http://localhost:5000/api/categories";
+const API = "https://imtiaz-trader-api.vercel.app/api/categories";
+
 
 function ProductCategories() {
   const [categories, setCategories] = useState([]);

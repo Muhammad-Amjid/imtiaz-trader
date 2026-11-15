@@ -3,7 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
-const SERVER_URL = "http://localhost:5000";
+const SERVER_URL = "https://imtiaz-trader-api.vercel.app";
 
 function getImageUrl(product) {
   const image = product.images?.find(Boolean) || product.image;

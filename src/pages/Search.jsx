@@ -2,8 +2,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 
-const API_URL = "http://localhost:5000/api/products";
-const SERVER_URL = "http://localhost:5000";
+const API_URL = "https://imtiaz-trader-api.vercel.app/api/products";
+const SERVER_URL = "https://imtiaz-trader-api.vercel.app";
 const whatsappNumber = "923355703153";
 
 function getImageUrl(product) {

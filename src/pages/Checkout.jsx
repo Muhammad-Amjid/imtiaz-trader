@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
-const ORDER_API = "http://localhost:5000/api/orders";
+const ORDER_API = "https://imtiaz-trader-api.vercel.app/api/orders";
 const WHATSAPP_NUMBER = "923355703153";
 
 const PAYMENT_DETAILS = {
