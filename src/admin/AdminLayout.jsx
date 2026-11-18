@@ -18,11 +18,13 @@ export default function AdminLayout() {
   }
 
   const menuItems = [
-    { label: "Dashboard", path: "/admin/dashboard", icon: "▦" },
-    { label: "Products", path: "/admin/products", icon: "▣" },
-    { label: "Categories", path: "/admin/categories", icon: "▤" },
-    { label: "Customer Enquiries", path: "/admin/enquiries", icon: "✉" },
-  ];
+  { label: "Dashboard", path: "/admin/dashboard", icon: "▦" },
+  { label: "Products", path: "/admin/products", icon: "▣" },
+  { label: "Orders", path: "/admin/orders", icon: "🛒" },
+  { label: "Customers", path: "/admin/customers", icon: "♙" },
+  { label: "Categories", path: "/admin/categories", icon: "▤" },
+  { label: "Customer Enquiries", path: "/admin/enquiries", icon: "✉" },
+];
 
   const logout = () => {
     localStorage.removeItem("adminToken");

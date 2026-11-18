@@ -2,12 +2,11 @@
 import React, { useEffect, useState } from "react";
 
 const SERVER_URL = "https://imtiaz-trader-api.vercel.app";
-
 const API = `${SERVER_URL}/api/products`;
 const CATEGORY_API = `${SERVER_URL}/api/categories`;
 
 const fallbackImage =
-  "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200";
+  "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400";
 
 const emptyForm = {
   name: "",
@@ -20,6 +19,7 @@ const emptyForm = {
   storage: "",
   graphics: "",
   price: "",
+  stock: 0,
   condition: "",
   availability: "Contact to confirm",
   description: "",
@@ -44,9 +44,22 @@ function ProductManagement() {
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
 
+  const [filters, setFilters] = useState({
+    brand: "",
+    category: "",
+    processor: "",
+    generation: "",
+    ram: "",
+    storage: "",
+    condition: "",
+    minPrice: "",
+    maxPrice: "",
+    status: "",
+  });
+
+  const [sortBy, setSortBy] = useState("newest");
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
-
   const [existingImages, setExistingImages] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
@@ -58,7 +71,32 @@ function ProductManagement() {
     setMessageType(type);
   };
 
-  // Fetch products
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+
+    setFilters((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  const clearFilters = () => {
+    setSearch("");
+    setFilters({
+      brand: "",
+      category: "",
+      processor: "",
+      generation: "",
+      ram: "",
+      storage: "",
+      condition: "",
+      minPrice: "",
+      maxPrice: "",
+      status: "",
+    });
+    setSortBy("newest");
+  };
+
   const fetchProducts = async () => {
     try {
       const response = await fetch(API);
@@ -76,7 +114,6 @@ function ProductManagement() {
     }
   };
 
-  // Fetch categories
   const fetchCategories = async () => {
     try {
       const response = await fetch(`${CATEGORY_API}/admin/all`, {
@@ -102,7 +139,6 @@ function ProductManagement() {
     fetchCategories();
   }, []);
 
-  // Clean up preview URLs
   useEffect(() => {
     return () => {
       previewImages.forEach((image) => {
@@ -111,7 +147,6 @@ function ProductManagement() {
     };
   }, [previewImages]);
 
-  // Form changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -121,7 +156,6 @@ function ProductManagement() {
     }));
   };
 
-  // Image selection
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files || []);
 
@@ -165,14 +199,12 @@ function ProductManagement() {
     );
   };
 
-  // Remove existing image
   const removeExistingImage = (index) => {
     setExistingImages((previous) =>
       previous.filter((_, i) => i !== index)
     );
   };
 
-  // Remove new image
   const removeNewImage = (index) => {
     setSelectedImages((previous) =>
       previous.filter((_, i) => i !== index)
@@ -183,7 +215,6 @@ function ProductManagement() {
     );
   };
 
-  // Reset form
   const resetForm = () => {
     setForm(emptyForm);
     setEditingId(null);
@@ -199,7 +230,6 @@ function ProductManagement() {
     }
   };
 
-  // Edit product
   const handleEdit = (product) => {
     setEditingId(product._id);
 
@@ -214,6 +244,7 @@ function ProductManagement() {
       storage: product.storage || "",
       graphics: product.graphics || "",
       price: product.price ?? "",
+      stock: product.stock ?? 0,
       condition: product.condition || "",
       availability: product.availability || "Contact to confirm",
       description: product.description || "",
@@ -245,7 +276,6 @@ function ProductManagement() {
     });
   };
 
-  // Save product
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -280,7 +310,6 @@ function ProductManagement() {
 
       Object.entries(form).forEach(([key, value]) => {
         if (key === "price" && value === "") return;
-
         productData.append(key, value);
       });
 
@@ -324,13 +353,15 @@ function ProductManagement() {
       resetForm();
       await fetchProducts();
     } catch (error) {
-      showMessage(error.message || "Unable to save product.", "error");
+      showMessage(
+        error.message || "Unable to save product.",
+        "error"
+      );
     } finally {
       setSaving(false);
     }
   };
 
-  // Delete product
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?")) {
       return;
@@ -365,22 +396,109 @@ function ProductManagement() {
       showMessage("Product deleted successfully!");
       await fetchProducts();
     } catch (error) {
-      showMessage(error.message || "Failed to delete product.", "error");
+      showMessage(
+        error.message || "Failed to delete product.",
+        "error"
+      );
     }
   };
 
-  const filteredProducts = products.filter((product) => {
-    const text = [
-      product.name,
-      product.brand,
-      product.category,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
+  const uniqueValues = (field) =>
+    [
+      ...new Set(
+        products.map((product) => product[field]).filter(Boolean)
+      ),
+    ].sort((a, b) => String(a).localeCompare(String(b)));
 
-    return text.includes(search.toLowerCase().trim());
-  });
+  const filteredProducts = products
+    .filter((product) => {
+      const searchText = [
+        product.name,
+        product.brand,
+        product.category,
+        product.processor,
+        product.generation,
+        product.ram,
+        product.storage,
+        product.graphics,
+        product.operatingSystem,
+        product.condition,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      const matchesSearch = searchText.includes(
+        search.toLowerCase().trim()
+      );
+
+      const matchesBrand =
+        !filters.brand || product.brand === filters.brand;
+
+      const matchesCategory =
+        !filters.category || product.category === filters.category;
+
+      const matchesProcessor =
+        !filters.processor || product.processor === filters.processor;
+
+      const matchesGeneration =
+        !filters.generation || product.generation === filters.generation;
+
+      const matchesRam =
+        !filters.ram || product.ram === filters.ram;
+
+      const matchesStorage =
+        !filters.storage || product.storage === filters.storage;
+
+      const matchesCondition =
+        !filters.condition || product.condition === filters.condition;
+
+      const price = Number(product.price);
+
+      const matchesMinPrice =
+        filters.minPrice === "" ||
+        (product.price != null && price >= Number(filters.minPrice));
+
+      const matchesMaxPrice =
+        filters.maxPrice === "" ||
+        (product.price != null && price <= Number(filters.maxPrice));
+
+      const matchesStatus =
+        !filters.status ||
+        (filters.status === "available" && product.available !== false) ||
+        (filters.status === "unavailable" && product.available === false) ||
+        (filters.status === "featured" && product.featured === true) ||
+        (filters.status === "not-featured" && product.featured !== true);
+
+      return (
+        matchesSearch &&
+        matchesBrand &&
+        matchesCategory &&
+        matchesProcessor &&
+        matchesGeneration &&
+        matchesRam &&
+        matchesStorage &&
+        matchesCondition &&
+        matchesMinPrice &&
+        matchesMaxPrice &&
+        matchesStatus
+      );
+    })
+    .sort((a, b) => {
+      if (sortBy === "name") {
+        return (a.name || "").localeCompare(b.name || "");
+      }
+
+      if (sortBy === "price-low") {
+        return Number(a.price ?? Infinity) - Number(b.price ?? Infinity);
+      }
+
+      if (sortBy === "price-high") {
+        return Number(b.price ?? -Infinity) - Number(a.price ?? -Infinity);
+      }
+
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
 
   const InputField = ({
     label,
@@ -416,7 +534,7 @@ function ProductManagement() {
         .pm-page {
           background: #f5f6f8;
           min-height: 100vh;
-          padding: 28px;
+          padding: 25px;
           color: #222;
         }
 
@@ -426,7 +544,7 @@ function ProductManagement() {
           align-items: center;
           gap: 15px;
           flex-wrap: wrap;
-          margin-bottom: 25px;
+          margin-bottom: 22px;
         }
 
         .pm-eyebrow {
@@ -489,9 +607,9 @@ function ProductManagement() {
           background: #fff;
           border: 1px solid #ececec;
           border-radius: 13px;
-          padding: 25px;
-          margin-bottom: 25px;
-          box-shadow: 0 3px 14px rgba(0,0,0,0.035);
+          padding: 22px;
+          margin-bottom: 22px;
+          box-shadow: 0 3px 14px rgba(0,0,0,.035);
         }
 
         .pm-card-heading {
@@ -563,10 +681,6 @@ function ProductManagement() {
           min-width: 0;
         }
 
-        .pm-field.full {
-          grid-column: 1 / -1;
-        }
-
         .pm-field label {
           display: block;
           font-size: 12px;
@@ -621,6 +735,7 @@ function ProductManagement() {
         }
 
         .pm-upload {
+          display: block;
           border: 2px dashed #e4bcbc;
           background: #fffafa;
           border-radius: 10px;
@@ -802,7 +917,7 @@ function ProductManagement() {
         }
 
         .pm-search {
-          width: 260px;
+          width: 280px;
           max-width: 100%;
           padding: 10px 12px;
           border: 1px solid #ddd;
@@ -815,36 +930,136 @@ function ProductManagement() {
           border-color: #dc2626;
         }
 
+        .pm-category-tabs {
+          display: flex;
+          gap: 9px;
+          flex-wrap: wrap;
+          margin-bottom: 18px;
+        }
+
+        .pm-category-tabs button {
+          border: 1px solid #e5e5e5;
+          background: white;
+          color: #444;
+          padding: 9px 16px;
+          border-radius: 7px;
+          font-size: 12px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: .2s;
+        }
+
+        .pm-category-tabs button:hover {
+          border-color: #dc2626;
+          color: #dc2626;
+        }
+
+        .pm-category-tabs button.active {
+          background: #dc2626;
+          color: white;
+          border-color: #dc2626;
+        }
+
+        .pm-filter-panel {
+          background: #fafafa;
+          border: 1px solid #eee;
+          border-radius: 10px;
+          padding: 18px;
+          margin-bottom: 20px;
+        }
+
+        .pm-filter-title {
+          font-size: 13px;
+          font-weight: 800;
+          margin-bottom: 14px;
+        }
+
+        .pm-filter-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .pm-filter-grid input,
+        .pm-filter-grid select {
+          width: 100%;
+          min-width: 0;
+          box-sizing: border-box;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 7px;
+          background: white;
+          font-size: 12px;
+          outline: none;
+        }
+
+        .pm-filter-grid input:focus,
+        .pm-filter-grid select:focus {
+          border-color: #dc2626;
+        }
+
+        .pm-filter-actions {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 10px;
+          margin-top: 14px;
+          flex-wrap: wrap;
+        }
+
+        .pm-clear-filters {
+          border: none;
+          background: #fee2e2;
+          color: #991b1b;
+          padding: 9px 14px;
+          border-radius: 6px;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .pm-result-count {
+          color: #777;
+          font-size: 12px;
+          font-weight: 600;
+        }
+
+        /* Product card grid */
         .pm-product-list {
           display: grid;
-          gap: 12px;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 16px;
         }
 
         .pm-product {
           display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 15px;
-          padding: 14px;
+          flex-direction: column;
+          min-width: 0;
+          padding: 12px;
           border: 1px solid #eee;
-          border-radius: 10px;
+          border-radius: 11px;
           background: #fff;
+          transition: .2s;
+        }
+
+        .pm-product:hover {
+          border-color: #dc2626;
+          box-shadow: 0 4px 15px rgba(0,0,0,.06);
+          transform: translateY(-2px);
         }
 
         .pm-product-info {
           display: flex;
-          align-items: center;
-          gap: 13px;
+          flex-direction: column;
+          gap: 10px;
           min-width: 0;
         }
 
         .pm-product-info img {
-          width: 76px;
-          height: 70px;
+          width: 100%;
+          height: 145px;
           object-fit: contain;
-          background: #f6f6f6;
-          border-radius: 7px;
-          flex-shrink: 0;
+          background: #f7f7f7;
+          border-radius: 8px;
         }
 
         .pm-product-details {
@@ -864,15 +1079,15 @@ function ProductManagement() {
         }
 
         .pm-product-details small {
-          font-weight: 700;
-          color: #333;
-          font-size: 11px;
+          font-weight: 800;
+          color: #222;
+          font-size: 12px;
         }
 
         .pm-product-status {
           display: inline-block;
           padding: 4px 7px;
-          margin-top: 6px;
+          margin-top: 7px;
           font-size: 10px;
           border-radius: 20px;
           background: #dcfce7;
@@ -888,25 +1103,35 @@ function ProductManagement() {
         .pm-product-actions {
           display: flex;
           gap: 7px;
-          flex-shrink: 0;
+          margin-top: 12px;
         }
 
         .pm-product-actions button {
+          flex: 1;
           border: none;
-          padding: 8px 13px;
+          padding: 9px;
           border-radius: 6px;
           color: #fff;
           font-size: 11px;
           font-weight: 700;
           cursor: pointer;
+          transition: .2s;
         }
 
         .pm-edit {
           background: #222;
         }
 
+        .pm-edit:hover {
+          background: #444;
+        }
+
         .pm-delete {
           background: #dc2626;
+        }
+
+        .pm-delete:hover {
+          background: #b91c1c;
         }
 
         .pm-empty {
@@ -915,6 +1140,17 @@ function ProductManagement() {
           color: #888;
           background: #fafafa;
           border-radius: 9px;
+          grid-column: 1 / -1;
+        }
+
+        @media (max-width: 1050px) {
+          .pm-product-list {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .pm-filter-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
         }
 
         @media (max-width: 767px) {
@@ -965,29 +1201,22 @@ function ProductManagement() {
             flex: 1;
           }
 
-          .pm-product {
-            align-items: flex-start;
-            flex-wrap: wrap;
-          }
-
-          .pm-product-info {
-            width: 100%;
-          }
-
-          .pm-product-actions {
-            width: 100%;
-          }
-
-          .pm-product-actions button {
-            flex: 1;
-          }
-
           .pm-search {
             width: 100%;
           }
 
           .pm-list-header {
             align-items: stretch;
+          }
+        }
+
+        @media (max-width: 550px) {
+          .pm-product-list {
+            grid-template-columns: 1fr;
+          }
+
+          .pm-filter-grid {
+            grid-template-columns: 1fr;
           }
         }
       `}</style>
@@ -1015,7 +1244,6 @@ function ProductManagement() {
 
       {/* Product Form */}
       <form onSubmit={handleSubmit} className="pm-card">
-
         <div className="pm-card-heading">
           <div className="pm-heading-icon">
             {editingId ? "✎" : "+"}
@@ -1097,7 +1325,9 @@ function ProductManagement() {
 
         {/* Technical Specifications */}
         <div className="pm-section">
-          <h3 className="pm-section-title">Technical Specifications</h3>
+          <h3 className="pm-section-title">
+            Technical Specifications
+          </h3>
 
           <div className="pm-grid">
             <InputField
@@ -1140,7 +1370,9 @@ function ProductManagement() {
 
         {/* Pricing */}
         <div className="pm-section">
-          <h3 className="pm-section-title">Pricing & Availability</h3>
+          <h3 className="pm-section-title">
+            Pricing & Availability
+          </h3>
 
           <div className="pm-grid">
             <InputField
@@ -1149,6 +1381,14 @@ function ProductManagement() {
               type="number"
               placeholder="e.g. 85000"
               help="Leave empty if you want customers to contact you for price."
+            />
+
+            <InputField
+              label="Stock Quantity"
+              name="stock"
+              type="number"
+              placeholder="e.g. 10"
+              help="Enter the available quantity of this product."
             />
 
             <InputField
@@ -1161,7 +1401,9 @@ function ProductManagement() {
 
         {/* Description */}
         <div className="pm-section">
-          <h3 className="pm-section-title">Product Description</h3>
+          <h3 className="pm-section-title">
+            Product Description
+          </h3>
 
           <div className="pm-field">
             <label htmlFor="description">Description</label>
@@ -1202,7 +1444,10 @@ function ProductManagement() {
 
               <div className="pm-preview-grid">
                 {existingImages.map((image, index) => (
-                  <div key={`${image}-${index}`} className="pm-preview">
+                  <div
+                    key={`${image}-${index}`}
+                    className="pm-preview"
+                  >
                     <img
                       src={getImageUrl(image)}
                       alt={`Existing product ${index + 1}`}
@@ -1259,7 +1504,9 @@ function ProductManagement() {
 
               <span>
                 <strong>Featured Product</strong>
-                <small>Highlight this product in your store.</small>
+                <small>
+                  Highlight this product in your store.
+                </small>
               </span>
             </label>
 
@@ -1273,13 +1520,15 @@ function ProductManagement() {
 
               <span>
                 <strong>Available for Customers</strong>
-                <small>Allow customers to view this product.</small>
+                <small>
+                  Allow customers to view this product.
+                </small>
               </span>
             </label>
           </div>
         </div>
 
-        {/* Buttons */}
+        {/* Form Buttons */}
         <div className="pm-form-actions">
           <button
             type="submit"
@@ -1306,28 +1555,217 @@ function ProductManagement() {
       {/* Product List */}
       <section className="pm-card">
         <div className="pm-list-header">
-          <h2>All Products ({products.length})</h2>
+          <h2>All Products ({filteredProducts.length})</h2>
 
           <input
             type="search"
             className="pm-search"
-            placeholder="Search by name, brand or category..."
+            placeholder="Search any product detail..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+        </div>
+
+        {/* Category Tabs */}
+        <div className="pm-category-tabs">
+          <button
+            type="button"
+            className={!filters.category ? "active" : ""}
+            onClick={() =>
+              setFilters((previous) => ({
+                ...previous,
+                category: "",
+              }))
+            }
+          >
+            All Products
+          </button>
+
+          {uniqueValues("category").map((category) => (
+            <button
+              type="button"
+              key={category}
+              className={
+                filters.category === category ? "active" : ""
+              }
+              onClick={() =>
+                setFilters((previous) => ({
+                  ...previous,
+                  category,
+                }))
+              }
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        {/* Advanced Filters */}
+        <div className="pm-filter-panel">
+          <div className="pm-filter-title">
+            FILTER PRODUCTS
+          </div>
+
+          <div className="pm-filter-grid">
+            <select
+              name="brand"
+              value={filters.brand}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Brands</option>
+              {uniqueValues("brand").map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="category"
+              value={filters.category}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Categories</option>
+              {uniqueValues("category").map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="processor"
+              value={filters.processor}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Processors</option>
+              {uniqueValues("processor").map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="generation"
+              value={filters.generation}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Generations</option>
+              {uniqueValues("generation").map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="ram"
+              value={filters.ram}
+              onChange={handleFilterChange}
+            >
+              <option value="">All RAM</option>
+              {uniqueValues("ram").map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="storage"
+              value={filters.storage}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Storage</option>
+              {uniqueValues("storage").map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="condition"
+              value={filters.condition}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Conditions</option>
+              {uniqueValues("condition").map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="status"
+              value={filters.status}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Statuses</option>
+              <option value="available">Available</option>
+              <option value="unavailable">Unavailable</option>
+              <option value="featured">Featured</option>
+              <option value="not-featured">Not Featured</option>
+            </select>
+
+            <input
+              type="number"
+              name="minPrice"
+              placeholder="Minimum Price (PKR)"
+              min="0"
+              value={filters.minPrice}
+              onChange={handleFilterChange}
+            />
+
+            <input
+              type="number"
+              name="maxPrice"
+              placeholder="Maximum Price (PKR)"
+              min="0"
+              value={filters.maxPrice}
+              onChange={handleFilterChange}
+            />
+
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="newest">Newest First</option>
+              <option value="name">Name A–Z</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
+          </div>
+
+          <div className="pm-filter-actions">
+            <span className="pm-result-count">
+              Showing {filteredProducts.length} of {products.length} products
+            </span>
+
+            <button
+              type="button"
+              className="pm-clear-filters"
+              onClick={clearFilters}
+            >
+              Clear All Filters
+            </button>
+          </div>
         </div>
 
         {loading ? (
           <div className="pm-empty">Loading products...</div>
         ) : filteredProducts.length === 0 ? (
           <div className="pm-empty">
-            {search ? "No matching products found." : "No products found."}
+            {search || Object.values(filters).some(Boolean)
+              ? "No matching products found."
+              : "No products found."}
           </div>
         ) : (
           <div className="pm-product-list">
             {filteredProducts.map((product) => (
               <div key={product._id} className="pm-product">
-
                 <div className="pm-product-info">
                   <img
                     src={getImageUrl(
@@ -1350,17 +1788,32 @@ function ProductManagement() {
                         : "Contact for price"}
                     </small>
 
-                    <div>
+                    <p>Stock: {product.stock ?? 0} units</p>
+
+                    <span
+                      className={`pm-product-status ${
+                        product.available === false
+                          ? "unavailable"
+                          : ""
+                      }`}
+                    >
+                      {product.available === false
+                        ? "Unavailable"
+                        : "Available"}
+                    </span>
+
+                    {product.featured && (
                       <span
-                        className={`pm-product-status ${
-                          product.available === false ? "unavailable" : ""
-                        }`}
+                        className="pm-product-status"
+                        style={{
+                          marginLeft: "6px",
+                          background: "#fef3c7",
+                          color: "#92400e",
+                        }}
                       >
-                        {product.available === false
-                          ? "Unavailable"
-                          : "Available"}
+                        Featured
                       </span>
-                    </div>
+                    )}
                   </div>
                 </div>
 
@@ -1381,7 +1834,6 @@ function ProductManagement() {
                     Delete
                   </button>
                 </div>
-
               </div>
             ))}
           </div>

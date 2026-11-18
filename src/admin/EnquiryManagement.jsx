@@ -8,19 +8,25 @@ export default function EnquiryManagement() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
-  const headers = {
+  const getHeaders = () => ({
     Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
     "Content-Type": "application/json",
-  };
+  });
 
   const loadEnquiries = async () => {
     try {
-      const response = await fetch(API, { headers });
+      const response = await fetch(API, {
+        headers: getHeaders(),
+      });
+
       const data = await response.json();
 
-      if (!response.ok) throw new Error(data.message);
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to load enquiries.");
+      }
 
       setEnquiries(data.enquiries || []);
+      setMessage("");
     } catch (error) {
       setMessage(error.message || "Unable to load enquiries.");
     } finally {
@@ -34,20 +40,25 @@ export default function EnquiryManagement() {
 
   const updateStatus = async (id, status) => {
     try {
-      const response = await fetch(`${API}/${id}/status`, {
+      const response = await fetch(`${API}/${id}`, {
         method: "PATCH",
-        headers,
+        headers: getHeaders(),
         body: JSON.stringify({ status }),
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to update status.");
+      }
 
       setEnquiries((previous) =>
         previous.map((item) =>
           item._id === id ? data.enquiry : item
         )
       );
+
+      setMessage("Enquiry status updated successfully.");
     } catch (error) {
       setMessage(error.message);
     }
@@ -59,15 +70,20 @@ export default function EnquiryManagement() {
     try {
       const response = await fetch(`${API}/${id}`, {
         method: "DELETE",
-        headers,
+        headers: getHeaders(),
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to delete enquiry.");
+      }
 
       setEnquiries((previous) =>
         previous.filter((item) => item._id !== id)
       );
+
+      setMessage("Enquiry deleted successfully.");
     } catch (error) {
       setMessage(error.message);
     }
@@ -77,7 +93,9 @@ export default function EnquiryManagement() {
     <div className="container py-4">
       <h2 className="fw-bold mb-4">Customer Enquiries</h2>
 
-      {message && <div className="alert alert-info">{message}</div>}
+      {message && (
+        <div className="alert alert-info">{message}</div>
+      )}
 
       <div className="row g-3 mb-4">
         {["New", "In Progress", "Resolved"].map((status) => (
@@ -105,10 +123,7 @@ export default function EnquiryManagement() {
                   <div>
                     <h5 className="fw-bold mb-1">{item.subject}</h5>
                     <div>{item.name}</div>
-                    <div className="text-muted small">
-                      {item.phone}
-                      {item.email && ` • ${item.email}`}
-                    </div>
+                    <div className="text-muted small">{item.phone}</div>
                   </div>
 
                   <div className="text-muted small">
@@ -139,7 +154,6 @@ export default function EnquiryManagement() {
                     rel="noreferrer"
                   >
                     WhatsApp
-                    
                   </a>
 
                   <button

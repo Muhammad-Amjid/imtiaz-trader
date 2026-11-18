@@ -7,7 +7,6 @@ import {
   Navigate,
 } from "react-router-dom";
 
-// Main components
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import PromoSlider from "./components/PromoSlider";
@@ -22,7 +21,6 @@ import SoftwareServices from "./components/SoftwareServices";
 import AboutSection from "./components/AboutSection";
 import ContactCTA from "./components/ContactCTA";
 
-// Website pages
 import Products from "./pages/Products";
 import Brands from "./pages/Brands";
 import Search from "./pages/Search";
@@ -31,13 +29,14 @@ import Contact from "./pages/Contact";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 
-// Admin pages
 import AdminLogin from "./admin/AdminLogin";
 import AdminLayout from "./admin/AdminLayout";
 import AdminDashboard from "./admin/AdminDashboard";
 import ProductManagement from "./admin/ProductManagement";
+import OrderManagement from "./admin/OrderManagement";
 import CategoryManagement from "./admin/CategoryManagement";
 import EnquiryManagement from "./admin/EnquiryManagement";
+import CustomerManagement from "./admin/CustomerManagement";
 
 function Home() {
   return (
@@ -59,7 +58,6 @@ function Home() {
 
 function App() {
   const location = useLocation();
-
   const isAdminPage = location.pathname.startsWith("/admin");
 
   return (
@@ -67,7 +65,6 @@ function App() {
       {!isAdminPage && <Header />}
 
       <Routes>
-        {/* Main website */}
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
         <Route path="/brand/:brandName" element={<Brands />} />
@@ -78,16 +75,16 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
 
-        {/* Admin login */}
         <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* Shared admin layout */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="products" element={<ProductManagement />} />
+          <Route path="orders" element={<OrderManagement />} />
           <Route path="categories" element={<CategoryManagement />} />
           <Route path="enquiries" element={<EnquiryManagement />} />
+          <Route path="customers" element={<CustomerManagement />} />
         </Route>
       </Routes>
 
