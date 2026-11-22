@@ -46,6 +46,39 @@ const uploadToCloudinary = (buffer) => {
   });
 };
 
+// Validate product prices
+const validatePrices = (body) => {
+  const price =
+    body.price === "" || body.price == null
+      ? null
+      : Number(body.price);
+
+  const originalPrice =
+    body.originalPrice === "" || body.originalPrice == null
+      ? null
+      : Number(body.originalPrice);
+
+  if (
+    (price !== null && (!Number.isFinite(price) || price < 0)) ||
+    (originalPrice !== null &&
+      (!Number.isFinite(originalPrice) ||
+        price === null ||
+        originalPrice < price))
+  ) {
+    return {
+      valid: false,
+      message:
+        "Please enter valid prices. Original price must not be lower than selling price.",
+    };
+  }
+
+  return {
+    valid: true,
+    price,
+    originalPrice,
+  };
+};
+
 // Get all products
 router.get("/", async (req, res) => {
   try {
@@ -67,12 +100,25 @@ router.get("/", async (req, res) => {
 // Add product
 router.post("/", protectAdmin, upload.array("images", 8), async (req, res) => {
   try {
+    const prices = validatePrices(req.body);
+
+    if (!prices.valid) {
+      return res.status(400).json({
+        success: false,
+        message: prices.message,
+      });
+    }
+
     const imagePaths = await Promise.all(
-      (req.files || []).map((file) => uploadToCloudinary(file.buffer))
+      (req.files || []).map((file) =>
+        uploadToCloudinary(file.buffer)
+      )
     );
 
     const product = await Product.create({
       ...req.body,
+      price: prices.price,
+      originalPrice: prices.originalPrice,
       images: imagePaths,
       image: imagePaths[0] || "",
     });
@@ -102,10 +148,30 @@ router.put("/:id", protectAdmin, upload.array("images", 8), async (req, res) => 
       });
     }
 
+    const prices = validatePrices({
+      price:
+        req.body.price !== undefined
+          ? req.body.price
+          : product.price,
+      originalPrice:
+        req.body.originalPrice !== undefined
+          ? req.body.originalPrice
+          : product.originalPrice,
+    });
+
+    if (!prices.valid) {
+      return res.status(400).json({
+        success: false,
+        message: prices.message,
+      });
+    }
+
     let existingImages = [];
 
     try {
-      existingImages = JSON.parse(req.body.existingImages || "[]");
+      existingImages = JSON.parse(
+        req.body.existingImages || "[]"
+      );
     } catch {
       return res.status(400).json({
         success: false,
@@ -127,14 +193,21 @@ router.put("/:id", protectAdmin, upload.array("images", 8), async (req, res) => 
         : [];
 
     const retainedImages = existingImages.filter(
-      (image) => typeof image === "string" && oldImages.includes(image)
+      (image) =>
+        typeof image === "string" &&
+        oldImages.includes(image)
     );
 
     const newImages = await Promise.all(
-      (req.files || []).map((file) => uploadToCloudinary(file.buffer))
+      (req.files || []).map((file) =>
+        uploadToCloudinary(file.buffer)
+      )
     );
 
-    const updatedImages = [...retainedImages, ...newImages];
+    const updatedImages = [
+      ...retainedImages,
+      ...newImages,
+    ];
 
     const {
       existingImages: ignoredImages,
@@ -143,6 +216,8 @@ router.put("/:id", protectAdmin, upload.array("images", 8), async (req, res) => 
 
     Object.assign(product, updatedFields);
 
+    product.price = prices.price;
+    product.originalPrice = prices.originalPrice;
     product.images = updatedImages;
     product.image = updatedImages[0] || "";
 

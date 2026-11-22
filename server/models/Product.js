@@ -27,7 +27,22 @@ const productSchema = new mongoose.Schema(
     operatingSystem: { type: String, default: "" },
     storage: { type: String, default: "" },
     graphics: { type: String, default: "" },
-    price: { type: Number, default: null },
+
+    // Discounted selling price
+    price: {
+      type: Number,
+      default: null,
+      min: 0,
+    },
+
+    // Original price before discount
+    originalPrice: {
+      type: Number,
+      default: null,
+      min: 0,
+    },
+
+    stock: { type: Number, default: 0, min: 0 },
     condition: { type: String, default: "" },
     availability: {
       type: String,
