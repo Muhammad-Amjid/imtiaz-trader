@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
 const ORDER_API = "https://imtiaz-trader-api.vercel.app/api/orders";
-const WHATSAPP_NUMBER = "923355703153";
+const WHATSAPP_NUMBER = "923495092195";
 
 const PAYMENT_DETAILS = {
   bank: {
@@ -353,7 +353,7 @@ function Checkout() {
                     type="button"
                     className="btn btn-sm btn-outline-secondary ms-2 mt-2"
                     onClick={() =>
-                      navigator.clipboard.writeText("03355703153")
+                      navigator.clipboard.writeText("03495092195")
                     }
                   >
                     Copy Number

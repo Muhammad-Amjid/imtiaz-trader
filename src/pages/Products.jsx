@@ -151,7 +151,7 @@ function Products() {
         : ""
     } Please share more details and availability.`;
 
-    return `https://wa.me/923355703153?text=${encodeURIComponent(message)}`;
+    return `https://wa.me/923495092195?text=${encodeURIComponent(message)}`;
   };
 
   const changeCategory = (category) => {

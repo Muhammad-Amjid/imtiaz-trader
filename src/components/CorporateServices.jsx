@@ -5,7 +5,7 @@ import ScrollReveal from "./ScrollReveal";
 
 function CorporateServices() {
   const whatsappLink =
-    "https://wa.me/923355703153?text=" +
+    "https://wa.me/923495092195?text=" +
     encodeURIComponent(
       "Hello Imtiaz Trader! I am interested in corporate and bulk IT supply. Please share details about your available products and supply options."
     );

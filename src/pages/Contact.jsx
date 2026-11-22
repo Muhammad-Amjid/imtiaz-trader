@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 
 const API = "https://imtiaz-trader-api.vercel.app/api/enquiries";
-const WHATSAPP_NUMBER = "923355703153";
-const PHONE_NUMBER = "+923355703153";
+const WHATSAPP_NUMBER = "923495092195";
+const PHONE_NUMBER = "+923495092195";
 
 function Contact() {
   const [form, setForm] = useState({

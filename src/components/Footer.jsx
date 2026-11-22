@@ -42,7 +42,7 @@ function Footer() {
                 <i className="bi bi-youtube"></i>
               </a>
 
-              <a href="https://wa.me/923355703153" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+              <a href="https://wa.me/923495092195" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
                 <i className="bi bi-whatsapp"></i>
               </a>
             </div>
@@ -93,7 +93,7 @@ function Footer() {
 
             <div className="footer-contact-item">
               <i className="bi bi-telephone-fill"></i>
-              <a href="tel:+923355703153">
+              <a href="tel:+923495092195">
                 +92 335 570 3153
               </a>
             </div>

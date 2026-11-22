@@ -131,7 +131,7 @@ function AboutSection() {
             <div className="about-services-grid">
               {services.map((service, index) => (
                 <a
-                  href={`https://wa.me/923355703153?text=${encodeURIComponent(
+                  href={`https://wa.me/923495092195?text=${encodeURIComponent(
                     service.message
                   )}`}
                   target="_blank"

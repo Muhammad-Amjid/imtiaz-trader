@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 
 const ContactCTA = () => {
   const whatsappLink =
-    "https://wa.me/923355703153?text=" +
+    "https://wa.me/923495092195?text=" +
     encodeURIComponent(
       "Hello Imtiaz Trader! I would like to enquire about your products and IT services."
     );
