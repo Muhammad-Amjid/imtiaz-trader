@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 
 const API = "https://imtiaz-trader-api.vercel.app/api/categories";
@@ -50,14 +49,11 @@ function CategoryManagement() {
     setMessage("");
 
     try {
-      const response = await fetch(
-        editingId ? `${API}/${editingId}` : API,
-        {
-          method: editingId ? "PUT" : "POST",
-          headers,
-          body: JSON.stringify({ name, description }),
-        }
-      );
+      const response = await fetch(editingId ? `${API}/${editingId}` : API, {
+        method: editingId ? "PUT" : "POST",
+        headers,
+        body: JSON.stringify({ name, description }),
+      });
 
       const data = await response.json();
 
@@ -119,9 +115,7 @@ function CategoryManagement() {
     <div className="container py-4">
       <h2 className="fw-bold mb-4">Categories Management</h2>
 
-      {message && (
-        <div className="alert alert-info">{message}</div>
-      )}
+      {message && <div className="alert alert-info">{message}</div>}
 
       <div className="card shadow-sm border-0 p-4 mb-4">
         <h5 className="mb-3">

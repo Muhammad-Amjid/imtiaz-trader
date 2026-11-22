@@ -19,6 +19,7 @@ const emptyForm = {
   storage: "",
   graphics: "",
   price: "",
+  originalPrice: "",
   stock: 0,
   condition: "",
   availability: "Contact to confirm",
@@ -33,6 +34,44 @@ function getImageUrl(image) {
   return image.startsWith("http")
     ? image
     : `${SERVER_URL}${image.startsWith("/") ? "" : "/"}${image}`;
+}
+
+/*
+  IMPORTANT:
+  InputField is outside ProductManagement.
+  This prevents React from recreating the component
+  on every keystroke and losing input focus.
+*/
+function InputField({
+  label,
+  name,
+  placeholder,
+  required = false,
+  type = "text",
+  help,
+  form,
+  handleChange,
+}) {
+  return (
+    <div className="pm-field">
+      <label htmlFor={name}>
+        {label} {required && <span className="pm-required">*</span>}
+      </label>
+
+      <input
+        id={name}
+        name={name}
+        type={type}
+        value={form[name]}
+        onChange={handleChange}
+        placeholder={placeholder || `Enter ${label.toLowerCase()}`}
+        required={required}
+        min={type === "number" ? "0" : undefined}
+      />
+
+      {help && <small>{help}</small>}
+    </div>
+  );
 }
 
 function ProductManagement() {
@@ -244,6 +283,7 @@ function ProductManagement() {
       storage: product.storage || "",
       graphics: product.graphics || "",
       price: product.price ?? "",
+      originalPrice: product.originalPrice ?? "",
       stock: product.stock ?? 0,
       condition: product.condition || "",
       availability: product.availability || "Contact to confirm",
@@ -309,7 +349,6 @@ function ProductManagement() {
       const productData = new FormData();
 
       Object.entries(form).forEach(([key, value]) => {
-        if (key === "price" && value === "") return;
         productData.append(key, value);
       });
 
@@ -499,34 +538,6 @@ function ProductManagement() {
 
       return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
     });
-
-  const InputField = ({
-    label,
-    name,
-    placeholder,
-    required = false,
-    type = "text",
-    help,
-  }) => (
-    <div className="pm-field">
-      <label htmlFor={name}>
-        {label} {required && <span className="pm-required">*</span>}
-      </label>
-
-      <input
-        id={name}
-        name={name}
-        type={type}
-        value={form[name]}
-        onChange={handleChange}
-        placeholder={placeholder || `Enter ${label.toLowerCase()}`}
-        required={required}
-        min={type === "number" ? "0" : undefined}
-      />
-
-      {help && <small>{help}</small>}
-    </div>
-  );
 
   return (
     <div className="pm-page">
@@ -1023,7 +1034,6 @@ function ProductManagement() {
           font-weight: 600;
         }
 
-        /* Product card grid */
         .pm-product-list {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1265,6 +1275,8 @@ function ProductManagement() {
 
           <div className="pm-grid">
             <InputField
+              form={form}
+              handleChange={handleChange}
               label="Product Name"
               name="name"
               required
@@ -1272,6 +1284,8 @@ function ProductManagement() {
             />
 
             <InputField
+              form={form}
+              handleChange={handleChange}
               label="Brand"
               name="brand"
               required
@@ -1316,6 +1330,8 @@ function ProductManagement() {
             </div>
 
             <InputField
+              form={form}
+              handleChange={handleChange}
               label="Condition"
               name="condition"
               placeholder="e.g. New, Used, Refurbished"
@@ -1331,36 +1347,48 @@ function ProductManagement() {
 
           <div className="pm-grid">
             <InputField
+              form={form}
+              handleChange={handleChange}
               label="Processor"
               name="processor"
               placeholder="e.g. Intel Core i5"
             />
 
             <InputField
+              form={form}
+              handleChange={handleChange}
               label="Generation"
               name="generation"
               placeholder="e.g. 11th Generation"
             />
 
             <InputField
+              form={form}
+              handleChange={handleChange}
               label="RAM"
               name="ram"
               placeholder="e.g. 8GB DDR4"
             />
 
             <InputField
+              form={form}
+              handleChange={handleChange}
               label="Storage"
               name="storage"
               placeholder="e.g. 256GB SSD"
             />
 
             <InputField
+              form={form}
+              handleChange={handleChange}
               label="Graphics"
               name="graphics"
               placeholder="e.g. Intel UHD Graphics"
             />
 
             <InputField
+              form={form}
+              handleChange={handleChange}
               label="Operating System"
               name="operatingSystem"
               placeholder="e.g. Windows 11"
@@ -1376,14 +1404,28 @@ function ProductManagement() {
 
           <div className="pm-grid">
             <InputField
-              label="Price (PKR)"
-              name="price"
+              form={form}
+              handleChange={handleChange}
+              label="Original Price (PKR)"
+              name="originalPrice"
               type="number"
-              placeholder="e.g. 85000"
-              help="Leave empty if you want customers to contact you for price."
+              placeholder="e.g. 65000"
+              help="Price before discount."
             />
 
             <InputField
+              form={form}
+              handleChange={handleChange}
+              label="Sale Price (PKR)"
+              name="price"
+              type="number"
+              placeholder="e.g. 58000"
+              help="Actual selling price. Leave empty for contact pricing."
+            />
+
+            <InputField
+              form={form}
+              handleChange={handleChange}
               label="Stock Quantity"
               name="stock"
               type="number"
@@ -1392,11 +1434,41 @@ function ProductManagement() {
             />
 
             <InputField
+              form={form}
+              handleChange={handleChange}
               label="Availability Details"
               name="availability"
               placeholder="e.g. In Stock, Contact to confirm"
             />
           </div>
+
+          {form.price !== "" &&
+            form.originalPrice !== "" &&
+            Number(form.originalPrice) > Number(form.price) &&
+            Number(form.price) >= 0 && (
+              <div
+                style={{
+                  marginTop: "15px",
+                  padding: "12px",
+                  background: "#dcfce7",
+                  borderRadius: "8px",
+                  color: "#166534",
+                  fontWeight: 700,
+                }}
+              >
+                Discount Preview:{" "}
+                {Math.round(
+                  ((Number(form.originalPrice) - Number(form.price)) /
+                    Number(form.originalPrice)) *
+                    100
+                )}
+                % OFF
+                {" · "}You save Rs.{" "}
+                {(
+                  Number(form.originalPrice) - Number(form.price)
+                ).toLocaleString("en-PK")}
+              </div>
+            )}
         </div>
 
         {/* Description */}
@@ -1764,78 +1836,159 @@ function ProductManagement() {
           </div>
         ) : (
           <div className="pm-product-list">
-            {filteredProducts.map((product) => (
-              <div key={product._id} className="pm-product">
-                <div className="pm-product-info">
-                  <img
-                    src={getImageUrl(
-                      product.images?.[0] || product.image
-                    )}
-                    alt={product.name}
-                  />
+            {filteredProducts.map((product) => {
+              const salePrice = Number(product.price);
+              const originalPrice = Number(product.originalPrice);
 
-                  <div className="pm-product-details">
-                    <strong>{product.name}</strong>
+              const hasDiscount =
+                product.price != null &&
+                product.originalPrice != null &&
+                Number.isFinite(salePrice) &&
+                Number.isFinite(originalPrice) &&
+                originalPrice > salePrice &&
+                salePrice >= 0;
 
-                    <p>
-                      {product.brand || "No brand"} ·{" "}
-                      {product.category || "No category"}
-                    </p>
+              const discountPercentage = hasDiscount
+                ? Math.round(
+                    ((originalPrice - salePrice) / originalPrice) * 100
+                  )
+                : 0;
 
-                    <small>
-                      {product.price != null
-                        ? `Rs. ${Number(product.price).toLocaleString("en-PK")}`
-                        : "Contact for price"}
-                    </small>
+              return (
+                <div key={product._id} className="pm-product">
+                  <div className="pm-product-info">
+                    <img
+                      src={getImageUrl(
+                        product.images?.[0] || product.image
+                      )}
+                      alt={product.name}
+                    />
 
-                    <p>Stock: {product.stock ?? 0} units</p>
+                    <div className="pm-product-details">
+                      <strong>{product.name}</strong>
 
-                    <span
-                      className={`pm-product-status ${
-                        product.available === false
-                          ? "unavailable"
-                          : ""
-                      }`}
-                    >
-                      {product.available === false
-                        ? "Unavailable"
-                        : "Available"}
-                    </span>
+                      <p>
+                        {product.brand || "No brand"} ·{" "}
+                        {product.category || "No category"}
+                      </p>
 
-                    {product.featured && (
+                      {hasDiscount && (
+                        <div
+                          style={{
+                            display: "inline-block",
+                            background: "#fee2e2",
+                            color: "#b91c1c",
+                            padding: "4px 8px",
+                            borderRadius: "5px",
+                            fontSize: "10px",
+                            fontWeight: 800,
+                            marginBottom: "6px",
+                          }}
+                        >
+                          {discountPercentage}% OFF
+                        </div>
+                      )}
+
+                      {product.price != null ? (
+                        <>
+                          <div>
+                            <strong
+                              style={{
+                                color: "#dc2626",
+                                fontSize: "14px",
+                              }}
+                            >
+                              Rs. {salePrice.toLocaleString("en-PK")}
+                            </strong>
+
+                            {hasDiscount && (
+                              <span
+                                style={{
+                                  marginLeft: "7px",
+                                  color: "#888",
+                                  textDecoration: "line-through",
+                                  fontSize: "11px",
+                                }}
+                              >
+                                Rs. {originalPrice.toLocaleString("en-PK")}
+                              </span>
+                            )}
+                          </div>
+
+                          {hasDiscount && (
+                            <div
+                              style={{
+                                color: "#166534",
+                                fontSize: "11px",
+                                fontWeight: 700,
+                                marginTop: "4px",
+                              }}
+                            >
+                              You save Rs.{" "}
+                              {(originalPrice - salePrice).toLocaleString(
+                                "en-PK"
+                              )}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <strong
+                          style={{
+                            color: "#dc2626",
+                            fontSize: "12px",
+                          }}
+                        >
+                          Contact for price
+                        </strong>
+                      )}
+
+                      <p>Stock: {product.stock ?? 0} units</p>
+
                       <span
-                        className="pm-product-status"
-                        style={{
-                          marginLeft: "6px",
-                          background: "#fef3c7",
-                          color: "#92400e",
-                        }}
+                        className={`pm-product-status ${
+                          product.available === false ? "unavailable" : ""
+                        }`}
                       >
-                        Featured
+                        {product.available === false
+                          ? "Unavailable"
+                          : "Available"}
                       </span>
-                    )}
+
+                      {product.featured && (
+                        <span
+                          className="pm-product-status"
+                          style={{
+                            marginLeft: "6px",
+                            background: "#fef3c7",
+                            color: "#92400e",
+                          }}
+                        >
+                          Featured
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pm-product-actions">
+                    <button
+                      type="button"
+                      className="pm-edit"
+                      onClick={() => handleEdit(product)}
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      type="button"
+                      className="pm-delete"
+                      onClick={() => handleDelete(product._id)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
-
-                <div className="pm-product-actions">
-                  <button
-                    type="button"
-                    className="pm-edit"
-                    onClick={() => handleEdit(product)}
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    type="button"
-                    className="pm-delete"
-                    onClick={() => handleDelete(product._id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

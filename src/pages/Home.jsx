@@ -7,7 +7,6 @@ function Home() {
       <div className="container">
         <div className="hero-content">
 
-          {/* Animated Welcome Text */}
           <div className="hero-welcome">
             {Array.from(welcomeText).map((letter, index) => (
               <span
@@ -19,21 +18,18 @@ function Home() {
             ))}
           </div>
 
-          {/* Main Heading */}
           <h1 className="hero-title">
             Find the Right
             <br />
             <span>Technology</span> for You
           </h1>
 
-          {/* Description */}
           <p className="hero-description">
             Discover quality laptops, computers and accessories
             at Imtiaz Trader. Explore new and used devices from
             trusted brands at competitive prices.
           </p>
 
-          {/* Action Buttons */}
           <div className="hero-actions">
             <a
               href="#categories"
@@ -44,7 +40,7 @@ function Home() {
             </a>
 
             <a
-              href="https://wa.me/923355703153"
+              href="https://wa.me/923495092195"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-outline-dark btn-lg"

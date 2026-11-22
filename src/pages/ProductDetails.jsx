@@ -3,13 +3,12 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
-// Automatically uses the current device's hostname
 const SERVER_URL = "https://imtiaz-trader-api.vercel.app";
-
 const API_URL = `${SERVER_URL}/api/products`;
 
-const whatsappNumber = "923355703153";
-const phoneNumber = "+923355703153";
+// Updated business contact number
+const whatsappNumber = "923495092195";
+const phoneNumber = "+923495092195";
 
 const fallbackImage =
   "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800";
@@ -127,6 +126,36 @@ function ProductDetails() {
     product.available !== false &&
     product.availability !== "Unavailable";
 
+  // Calculate discount automatically
+  const salePrice =
+    product.price !== null && product.price !== ""
+      ? Number(product.price)
+      : null;
+
+  const originalPrice =
+    product.originalPrice !== null &&
+    product.originalPrice !== ""
+      ? Number(product.originalPrice)
+      : null;
+
+  const hasDiscount =
+    salePrice !== null &&
+    originalPrice !== null &&
+    Number.isFinite(salePrice) &&
+    Number.isFinite(originalPrice) &&
+    salePrice >= 0 &&
+    originalPrice > salePrice;
+
+  const discountPercentage = hasDiscount
+    ? Math.round(
+        ((originalPrice - salePrice) / originalPrice) * 100
+      )
+    : 0;
+
+  const savings = hasDiscount
+    ? originalPrice - salePrice
+    : 0;
+
   const handleAddToCart = () => {
     setCartMessage("");
     setCartError(false);
@@ -205,7 +234,6 @@ function ProductDetails() {
 
           {/* Product Images */}
           <div className="col-12 col-lg-6">
-
             <div className="product-main-image">
               {images.length > 0 ? (
                 <img
@@ -252,12 +280,10 @@ function ProductDetails() {
                 ))}
               </div>
             )}
-
           </div>
 
           {/* Product Information */}
           <div className="col-12 col-lg-6">
-
             <div className="product-info">
 
               <span className="badge bg-danger mb-3">
@@ -277,11 +303,48 @@ function ProductDetails() {
                   "Contact us for more product information."}
               </p>
 
-              <h2 className="text-danger fw-bold my-4 product-price">
-                {product.price != null && product.price !== ""
-                  ? `Rs. ${Number(product.price).toLocaleString("en-PK")}`
-                  : "Contact for Price"}
-              </h2>
+              {/* Discount Badge */}
+              {hasDiscount && (
+                <div className="mb-2">
+                  <span className="badge bg-danger discount-badge">
+                    {discountPercentage}% OFF
+                  </span>
+                </div>
+              )}
+
+              {/* Product Pricing */}
+              <div className="product-pricing my-4">
+
+                {salePrice !== null &&
+                Number.isFinite(salePrice) &&
+                salePrice >= 0 ? (
+                  <>
+                    <h2 className="text-danger fw-bold mb-1 product-price">
+                      Rs. {salePrice.toLocaleString("en-PK")}
+                    </h2>
+
+                    {hasDiscount && (
+                      <>
+                        <p className="text-secondary mb-1">
+                          <span className="text-decoration-line-through original-price">
+                            Rs. {originalPrice.toLocaleString("en-PK")}
+                          </span>
+                        </p>
+
+                        <p className="text-success fw-semibold mb-0">
+                          <i className="bi bi-tag-fill me-2" />
+                          You save Rs. {savings.toLocaleString("en-PK")}
+                        </p>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <h2 className="text-danger fw-bold product-price">
+                    Contact for Price
+                  </h2>
+                )}
+
+              </div>
 
               <hr />
 
@@ -469,6 +532,15 @@ function ProductDetails() {
           font-size: 1.9rem;
         }
 
+        .original-price {
+          font-size: 1.05rem;
+        }
+
+        .discount-badge {
+          font-size: 14px;
+          padding: 8px 12px;
+        }
+
         .product-description {
           line-height: 1.7;
         }
@@ -530,8 +602,6 @@ function ProductDetails() {
 
           .product-price {
             font-size: 1.55rem;
-            margin-top: 18px !important;
-            margin-bottom: 18px !important;
           }
 
           .product-description {

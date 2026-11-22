@@ -4,7 +4,7 @@ import { useSearchParams, Link } from "react-router-dom";
 
 const API_URL = "https://imtiaz-trader-api.vercel.app/api/products";
 const SERVER_URL = "https://imtiaz-trader-api.vercel.app";
-const whatsappNumber = "923355703153";
+const whatsappNumber = "923495092195";
 
 function getImageUrl(product) {
   const image = product.images?.find(Boolean) || product.image;
@@ -22,7 +22,6 @@ function Search() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch products from the backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -53,7 +52,6 @@ function Search() {
     fetchProducts();
   }, []);
 
-  // Search products
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query
       .toLowerCase()
@@ -88,18 +86,14 @@ function Search() {
     });
   }, [products, query]);
 
-  // WhatsApp enquiry link
   const getWhatsAppLink = (product) => {
     const message = `Hello Imtiaz Trader! I am interested in ${product.name}. Please share more details and availability.`;
 
-    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-      message
-    )}`;
+    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
   };
 
   return (
     <main>
-      {/* Search Page Header */}
       <section className="bg-dark text-white py-5">
         <div className="container py-3">
           <p className="text-danger fw-bold mb-2">
@@ -115,7 +109,6 @@ function Search() {
       </section>
 
       <section className="container py-5">
-        {/* Search Information */}
         <div className="mb-4">
           <h3 className="fw-bold">Search Results</h3>
 
@@ -136,7 +129,6 @@ function Search() {
           )}
         </div>
 
-        {/* Loading */}
         {loading ? (
           <div className="text-center py-5">
             <div className="spinner-border text-danger" role="status">
@@ -145,7 +137,6 @@ function Search() {
             <p className="text-secondary mt-3">Loading products...</p>
           </div>
         ) : error ? (
-          /* Error */
           <div className="text-center py-5">
             <h4 className="fw-bold">Something went wrong</h4>
             <p className="text-secondary">{error}</p>
@@ -158,12 +149,43 @@ function Search() {
           </div>
         ) : (
           <>
-            {/* Products */}
             {filteredProducts.length > 0 && query ? (
               <div className="row g-4">
                 {filteredProducts.map((product) => {
                   const productId = product._id || product.id;
                   const imageUrl = getImageUrl(product);
+
+                  const price =
+                    product.price !== "" && product.price != null
+                      ? Number(product.price)
+                      : null;
+
+                  const originalPrice =
+                    product.originalPrice !== "" &&
+                    product.originalPrice != null
+                      ? Number(product.originalPrice)
+                      : null;
+
+                  const hasValidPrice =
+                    price !== null &&
+                    Number.isFinite(price) &&
+                    price >= 0;
+
+                  const hasDiscount =
+                    hasValidPrice &&
+                    originalPrice !== null &&
+                    Number.isFinite(originalPrice) &&
+                    originalPrice > price;
+
+                  const discountPercentage = hasDiscount
+                    ? Math.round(
+                        ((originalPrice - price) / originalPrice) * 100
+                      )
+                    : 0;
+
+                  const savings = hasDiscount
+                    ? originalPrice - price
+                    : 0;
 
                   return (
                     <div
@@ -172,7 +194,7 @@ function Search() {
                     >
                       <div className="card product-card h-100 shadow-sm border-0 overflow-hidden">
                         <div
-                          className="bg-light d-flex justify-content-center align-items-center"
+                          className="bg-light d-flex justify-content-center align-items-center position-relative"
                           style={{ height: "240px" }}
                         >
                           {imageUrl ? (
@@ -192,6 +214,15 @@ function Search() {
                               <i className="bi bi-image display-3"></i>
                               <p className="mb-0">No Image Available</p>
                             </div>
+                          )}
+
+                          {hasDiscount && (
+                            <span
+                              className="badge bg-danger position-absolute top-0 start-0 m-3"
+                              style={{ fontSize: "13px", padding: "8px 10px" }}
+                            >
+                              {discountPercentage}% OFF
+                            </span>
                           )}
                         </div>
 
@@ -216,13 +247,33 @@ function Search() {
                             RAM: {product.ram || "Not specified"}
                           </p>
 
-                          <h5 className="text-danger fw-bold mb-3">
-                            {product.price != null && product.price !== ""
-                              ? `Rs. ${Number(product.price).toLocaleString(
-                                  "en-PK"
-                                )}`
-                              : "Contact for Price"}
-                          </h5>
+                          <div className="mb-3">
+                            {hasValidPrice ? (
+                              <>
+                                <h5 className="text-danger fw-bold mb-1">
+                                  Rs. {price.toLocaleString("en-PK")}
+                                </h5>
+
+                                {hasDiscount && (
+                                  <>
+                                    <p className="text-secondary mb-1">
+                                      <del>
+                                        Rs. {originalPrice.toLocaleString("en-PK")}
+                                      </del>
+                                    </p>
+
+                                    <small className="text-success fw-semibold">
+                                      You save Rs. {savings.toLocaleString("en-PK")}
+                                    </small>
+                                  </>
+                                )}
+                              </>
+                            ) : (
+                              <h5 className="text-danger fw-bold">
+                                Contact for Price
+                              </h5>
+                            )}
+                          </div>
 
                           <div className="mt-auto">
                             <Link
@@ -258,7 +309,6 @@ function Search() {
                 })}
               </div>
             ) : (
-              /* No Products Found */
               <div className="text-center py-5">
                 <i className="bi bi-search display-3 text-secondary"></i>
 

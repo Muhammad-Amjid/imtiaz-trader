@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ScrollReveal from "./ScrollReveal";
 
-// Automatically uses the current device's hostname
 const SERVER_URL = "https://imtiaz-trader-api.vercel.app";
 const API_URL = `${SERVER_URL}/api/products`;
 
@@ -15,7 +14,38 @@ function getImageUrl(image) {
 
   return image.startsWith("http")
     ? image
-    : `${SERVER_URL}${image}`;
+    : `${SERVER_URL}${image.startsWith("/") ? "" : "/"}${image}`;
+}
+
+function formatPrice(price) {
+  return `Rs. ${Number(price).toLocaleString("en-PK")}`;
+}
+
+function getDiscount(product) {
+  const salePrice = Number(product.price);
+  const originalPrice = Number(product.originalPrice);
+
+  if (
+    product.price == null ||
+    product.originalPrice == null ||
+    product.price === "" ||
+    product.originalPrice === "" ||
+    !Number.isFinite(salePrice) ||
+    !Number.isFinite(originalPrice) ||
+    originalPrice <= salePrice ||
+    salePrice < 0
+  ) {
+    return null;
+  }
+
+  return {
+    salePrice,
+    originalPrice,
+    percentage: Math.round(
+      ((originalPrice - salePrice) / originalPrice) * 100
+    ),
+    savings: originalPrice - salePrice,
+  };
 }
 
 function FeaturedProducts() {
@@ -26,6 +56,8 @@ function FeaturedProducts() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchProducts = async () => {
       try {
         const response = await fetch(API_URL);
@@ -35,20 +67,29 @@ function FeaturedProducts() {
           throw new Error("Unable to load products.");
         }
 
-        const availableProducts = (data.products || []).filter(
-          (product) => product.available !== false
-        );
+        if (isMounted) {
+          const availableProducts = (data.products || []).filter(
+            (product) => product.available !== false
+          );
 
-        setProducts(availableProducts);
+          setProducts(availableProducts);
+        }
       } catch (error) {
         console.error("Featured products error:", error);
-        setError("Unable to load products. Please try again later.");
+
+        if (isMounted) {
+          setError("Unable to load products. Please try again later.");
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchProducts();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const selectedProducts = products
@@ -56,9 +97,7 @@ function FeaturedProducts() {
     .slice(0, 6);
 
   const featuredProducts =
-    selectedProducts.length > 0
-      ? selectedProducts
-      : products.slice(0, 6);
+    selectedProducts.length > 0 ? selectedProducts : products.slice(0, 6);
 
   return (
     <ScrollReveal>
@@ -83,8 +122,8 @@ function FeaturedProducts() {
               </div>
             ) : featuredProducts.length > 0 ? (
               featuredProducts.map((product) => {
-                const imagePath =
-                  product.images?.[0] || product.image;
+                const imagePath = product.images?.[0] || product.image;
+                const discount = getDiscount(product);
 
                 return (
                   <div
@@ -102,6 +141,12 @@ function FeaturedProducts() {
                             event.currentTarget.src = fallbackImage;
                           }}
                         />
+
+                        {discount && (
+                          <span className="featured-discount-badge">
+                            {discount.percentage}% OFF
+                          </span>
+                        )}
                       </div>
 
                       <div className="card-body p-3 p-md-4 d-flex flex-column">
@@ -119,12 +164,37 @@ function FeaturedProducts() {
                           {product.description}
                         </p>
 
+                        <div className="featured-product-pricing mb-3">
+                          {discount ? (
+                            <>
+                              <strong className="featured-sale-price">
+                                {formatPrice(discount.salePrice)}
+                              </strong>
+
+                              <div className="featured-original-price">
+                                {formatPrice(discount.originalPrice)}
+                              </div>
+
+                              <div className="featured-savings">
+                                You save {formatPrice(discount.savings)}
+                              </div>
+                            </>
+                          ) : product.price != null &&
+                            product.price !== "" ? (
+                            <strong className="text-danger fs-5">
+                              {formatPrice(product.price)}
+                            </strong>
+                          ) : (
+                            <strong className="text-danger">
+                              Contact for price
+                            </strong>
+                          )}
+                        </div>
+
                         <button
                           type="button"
                           className="btn btn-outline-danger w-100 mt-auto"
-                          onClick={() =>
-                            navigate(`/product/${product._id}`)
-                          }
+                          onClick={() => navigate(`/product/${product._id}`)}
                         >
                           View Details
                           <i className="bi bi-arrow-right ms-2"></i>
@@ -178,8 +248,7 @@ function FeaturedProducts() {
           .product-card {
             border-radius: 12px;
             background: #ffffff;
-            transition: transform 0.3s ease,
-                        box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
           }
 
           .product-card:hover {
@@ -188,6 +257,7 @@ function FeaturedProducts() {
           }
 
           .featured-image-wrapper {
+            position: relative;
             width: 100%;
             height: 230px;
             padding: 15px;
@@ -209,6 +279,20 @@ function FeaturedProducts() {
             transform: scale(1.05);
           }
 
+          .featured-discount-badge {
+            position: absolute;
+            top: 13px;
+            left: 13px;
+            z-index: 2;
+            background: #dc2626;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 7px 11px;
+            border-radius: 5px;
+            box-shadow: 0 2px 7px rgba(0,0,0,0.18);
+          }
+
           .featured-product-name {
             font-size: 18px;
             line-height: 1.4;
@@ -222,6 +306,27 @@ function FeaturedProducts() {
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+          }
+
+          .featured-sale-price {
+            display: block;
+            color: #dc2626;
+            font-size: 21px;
+            font-weight: 800;
+          }
+
+          .featured-original-price {
+            color: #888888;
+            font-size: 14px;
+            text-decoration: line-through;
+            margin-top: 2px;
+          }
+
+          .featured-savings {
+            color: #198754;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 4px;
           }
 
           .featured-all-button {
@@ -255,7 +360,6 @@ function FeaturedProducts() {
             }
           }
 
-          /* Three product cards per row on phones */
           @media (max-width: 575.98px) {
             .featured-section {
               padding: 30px 0;
@@ -296,6 +400,14 @@ function FeaturedProducts() {
               padding: 5px;
             }
 
+            .featured-discount-badge {
+              top: 5px;
+              left: 5px;
+              font-size: 8px;
+              padding: 4px 5px;
+              border-radius: 3px;
+            }
+
             .product-card {
               border-radius: 8px;
             }
@@ -321,6 +433,22 @@ function FeaturedProducts() {
               line-height: 1.35;
               -webkit-line-clamp: 2;
               margin-bottom: 7px;
+            }
+
+            .featured-sale-price {
+              font-size: 11px;
+            }
+
+            .featured-original-price {
+              font-size: 8px;
+            }
+
+            .featured-savings {
+              font-size: 8px;
+            }
+
+            .featured-product-pricing {
+              margin-bottom: 8px !important;
             }
 
             .product-card .btn {

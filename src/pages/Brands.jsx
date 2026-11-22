@@ -3,7 +3,7 @@ import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { products } from "../data/products";
 
-const WHATSAPP_NUMBER = "923355703153";
+const WHATSAPP_NUMBER = "923495092195";
 
 function Brands() {
   const { brandName } = useParams();
@@ -17,27 +17,36 @@ function Brands() {
       product.brand?.toLowerCase() === selectedBrand
   );
 
-  const displayBrand =
-    brandProducts[0]?.brand ||
-    selectedBrand.replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const getWhatsAppLink = (product) => {
+    const message = `Hello Imtiaz Trader! I am interested in ${product.name}. Please share more details and availability.`;
+
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  };
 
   return (
     <main>
       <section className="bg-dark text-white py-5">
-        <div className="container">
+        <div className="container py-3">
           <p className="text-danger fw-bold mb-2">
             IMTIAZ TRADER
           </p>
-          <h1 className="fw-bold">{displayBrand}</h1>
-          <p className="text-white-50 mb-0">
-            Explore our {displayBrand} products.
+
+          <h1 className="fw-bold text-capitalize">
+            {selectedBrand} Products
+          </h1>
+
+          <p className="text-light mb-0">
+            Explore products from your favourite brand.
           </p>
         </div>
       </section>
 
       <section className="container py-5">
-        <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-          <h2 className="fw-bold mb-0">Available Products</h2>
+        <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+          <h3 className="fw-bold mb-0">
+            {selectedBrand} Products
+          </h3>
+
           <span className="text-secondary">
             {brandProducts.length} Products
           </span>
@@ -46,66 +55,131 @@ function Brands() {
         {brandProducts.length > 0 ? (
           <div className="row g-4">
             {brandProducts.map((product) => {
-              const message = `Hello Imtiaz Trader, I am interested in ${product.name}. Please share more details.`;
+              const price =
+                product.price !== "" && product.price != null
+                  ? Number(product.price)
+                  : null;
+
+              const originalPrice =
+                product.originalPrice !== "" &&
+                product.originalPrice != null
+                  ? Number(product.originalPrice)
+                  : null;
+
+              const hasValidPrice =
+                price !== null &&
+                Number.isFinite(price) &&
+                price >= 0;
+
+              const hasDiscount =
+                hasValidPrice &&
+                originalPrice !== null &&
+                Number.isFinite(originalPrice) &&
+                originalPrice > price;
+
+              const discountPercentage = hasDiscount
+                ? Math.round(
+                    ((originalPrice - price) / originalPrice) * 100
+                  )
+                : 0;
+
+              const savings = hasDiscount
+                ? originalPrice - price
+                : 0;
 
               return (
-                <div className="col-12 col-md-6 col-lg-4" key={product.id}>
-                  <div className="card h-100 border-0 shadow-sm">
+                <div
+                  className="col-12 col-sm-6 col-lg-4"
+                  key={product.id}
+                >
+                  <div className="card product-card h-100 shadow-sm border-0 overflow-hidden">
                     <div
-                      className="bg-light p-3 d-flex align-items-center justify-content-center"
-                      style={{ height: "230px" }}
+                      className="bg-light position-relative d-flex justify-content-center align-items-center"
+                      style={{ height: "240px" }}
                     >
                       <img
-                        src={product.image || "/products/laptop-placeholder.jpeg"}
+                        src={
+                          product.images?.[0] ||
+                          product.image ||
+                          "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400"
+                        }
                         alt={product.name}
                         className="img-fluid"
                         style={{
-                          maxHeight: "200px",
                           width: "100%",
+                          height: "100%",
                           objectFit: "contain",
-                        }}
-                        onError={(event) => {
-                          event.currentTarget.src =
-                            "/products/laptop-placeholder.jpeg";
+                          padding: "15px",
                         }}
                       />
+
+                      {hasDiscount && (
+                        <span
+                          className="badge bg-danger position-absolute top-0 start-0 m-3"
+                          style={{ fontSize: "13px", padding: "8px 10px" }}
+                        >
+                          {discountPercentage}% OFF
+                        </span>
+                      )}
                     </div>
 
-                    <div className="card-body d-flex flex-column">
-                      <span className="text-danger fw-semibold small">
+                    <div className="card-body p-4 d-flex flex-column">
+                      <p className="text-danger fw-semibold mb-2">
                         {product.brand}
-                      </span>
+                      </p>
 
-                      <h5 className="fw-bold mt-2">
+                      <h5 className="fw-bold">
                         {product.name}
                       </h5>
 
-                      <p className="text-secondary small">
-                        {product.description || "Contact us for details."}
+                      <p className="text-secondary">
+                        {product.description}
                       </p>
 
-                      <p className="fw-bold">
-                        {product.price != null
-                          ? `Rs. ${Number(product.price).toLocaleString("en-PK")}`
-                          : "Contact for Price"}
-                      </p>
+                      <div className="mb-3">
+                        {hasValidPrice ? (
+                          <>
+                            <h5 className="text-danger fw-bold mb-1">
+                              Rs. {price.toLocaleString("en-PK")}
+                            </h5>
+
+                            {hasDiscount && (
+                              <>
+                                <p className="text-secondary mb-1">
+                                  <del>
+                                    Rs. {originalPrice.toLocaleString("en-PK")}
+                                  </del>
+                                </p>
+
+                                <small className="text-success fw-semibold">
+                                  You save Rs. {savings.toLocaleString("en-PK")}
+                                </small>
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <h5 className="text-danger fw-bold">
+                            Contact for Price
+                          </h5>
+                        )}
+                      </div>
 
                       <div className="mt-auto">
                         <Link
                           to={`/product/${product.id}`}
-                          className="btn btn-outline-dark w-100 mb-2"
+                          className="btn btn-danger w-100 mb-2"
                         >
                           View Details
                         </Link>
 
                         <a
-                          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`}
+                          href={getWhatsAppLink(product)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="btn btn-danger w-100"
+                          className="btn btn-success w-100"
                         >
                           <i className="bi bi-whatsapp me-2"></i>
-                          Enquire Now
+                          WhatsApp Enquiry
                         </a>
                       </div>
                     </div>
@@ -116,15 +190,16 @@ function Brands() {
           </div>
         ) : (
           <div className="text-center py-5">
-            <i className="bi bi-laptop display-1 text-secondary"></i>
-            <h3 className="fw-bold mt-3">
-              Products Coming Soon
-            </h3>
+            <h4 className="fw-bold">
+              No Products Found
+            </h4>
+
             <p className="text-secondary">
-              We are updating our {displayBrand} collection.
+              No products are currently available for this brand.
             </p>
+
             <Link to="/products" className="btn btn-danger">
-              Explore All Products
+              Browse All Products
             </Link>
           </div>
         )}
