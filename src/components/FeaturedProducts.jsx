@@ -97,7 +97,9 @@ function FeaturedProducts() {
     .slice(0, 6);
 
   const featuredProducts =
-    selectedProducts.length > 0 ? selectedProducts : products.slice(0, 6);
+    selectedProducts.length > 0
+      ? selectedProducts
+      : products.slice(0, 6);
 
   return (
     <ScrollReveal>
@@ -122,7 +124,9 @@ function FeaturedProducts() {
               </div>
             ) : featuredProducts.length > 0 ? (
               featuredProducts.map((product) => {
-                const imagePath = product.images?.[0] || product.image;
+                const imagePath =
+                  product.images?.[0] || product.image;
+
                 const discount = getDiscount(product);
 
                 return (
@@ -194,7 +198,9 @@ function FeaturedProducts() {
                         <button
                           type="button"
                           className="btn btn-outline-danger w-100 mt-auto"
-                          onClick={() => navigate(`/product/${product._id}`)}
+                          onClick={() =>
+                            navigate(`/product/${product._id}`)
+                          }
                         >
                           View Details
                           <i className="bi bi-arrow-right ms-2"></i>
@@ -256,11 +262,12 @@ function FeaturedProducts() {
             box-shadow: 0 12px 25px rgba(0,0,0,0.10) !important;
           }
 
+          /* Product image */
           .featured-image-wrapper {
             position: relative;
             width: 100%;
             height: 230px;
-            padding: 15px;
+            padding: 0;
             background: #f8f8f8;
             display: flex;
             align-items: center;
@@ -269,14 +276,11 @@ function FeaturedProducts() {
           }
 
           .featured-image-wrapper img {
+            display: block;
             width: 100%;
             height: 100%;
             object-fit: contain;
-            transition: transform 0.4s ease;
-          }
-
-          .product-card:hover .featured-image-wrapper img {
-            transform: scale(1.05);
+            object-position: center;
           }
 
           .featured-discount-badge {
@@ -396,8 +400,8 @@ function FeaturedProducts() {
             }
 
             .featured-image-wrapper {
-              height: 95px;
-              padding: 5px;
+              height: 120px;
+              padding: 0;
             }
 
             .featured-discount-badge {

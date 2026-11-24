@@ -154,24 +154,29 @@ function ProductManagement() {
   };
 
   const fetchCategories = async () => {
-    try {
-      const response = await fetch(`${CATEGORY_API}/admin/all`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  try {
+    let response = await fetch(`${CATEGORY_API}/admin/all`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      const data = await response.json();
+    let data = await response.json();
 
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Unable to load categories.");
-      }
-
-      setCategories(data.categories || []);
-    } catch (error) {
-      console.error("Category loading error:", error);
+    if (!response.ok || !data.success) {
+      response = await fetch(CATEGORY_API);
+      data = await response.json();
     }
-  };
+
+    if (!response.ok) {
+      throw new Error(data.message || "Unable to load categories.");
+    }
+
+    setCategories(data.categories || []);
+  } catch (error) {
+    console.error("Category loading error:", error);
+  }
+};
 
   useEffect(() => {
     fetchProducts();

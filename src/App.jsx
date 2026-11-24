@@ -38,14 +38,15 @@ import CategoryManagement from "./admin/CategoryManagement";
 import EnquiryManagement from "./admin/EnquiryManagement";
 import CustomerManagement from "./admin/CustomerManagement";
 
+
 function Home() {
   return (
     <>
       <PromoSlider />
-      <ProductCategories />
       <Categories />
       <FeaturedProducts />
       <DesktopComputers />
+      <ProductCategories />
       <WhyChooseUs />
       <CorporateServices />
       <LaptopExchange />
@@ -55,6 +56,7 @@ function Home() {
     </>
   );
 }
+
 
 function App() {
   const location = useLocation();
