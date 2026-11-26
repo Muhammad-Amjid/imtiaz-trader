@@ -24,6 +24,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   "http://192.168.1.16:5173",
+  "https://imtiaz-trader.netlify.app",
+  "https://imtiaztrader.pages.dev",
   process.env.CLIENT_URL,
 ].filter(Boolean);
 
