@@ -1,15 +1,16 @@
 
+<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://imtiaz-trader.netlify.app/</loc>
+    <loc>https://imtiaztrader.pages.dev/</loc>
   </url>
   <url>
-    <loc>https://imtiaz-trader.netlify.app/products</loc>
+    <loc>https://imtiaztrader.pages.dev/products</loc>
   </url>
   <url>
-    <loc>https://imtiaz-trader.netlify.app/about</loc>
+    <loc>https://imtiaztrader.pages.dev/about</loc>
   </url>
   <url>
-    <loc>https://imtiaz-trader.netlify.app/contact</loc>
+    <loc>https://imtiaztrader.pages.dev/contact</loc>
   </url>
 </urlset>
